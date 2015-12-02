@@ -1,0 +1,17 @@
+time python testSeries.py $1 0.01 0 $2
+time python testSeries.py $1 0.01 0.1 $2
+time python testSeries.py $1 0.01 0.2 $2
+time python testSeries.py $1 0.01 0.3 $2
+time python testSeries.py $1 0.01 0.4 $2
+time python testSeries.py $1 0.01 0.5 $2
+time python testSeries.py $1 0.01 0.6 $2
+time python testSeries.py $1 0.01 0.7 $2
+time python testSeries.py $1 0.01 0.8 $2
+time python testSeries.py $1 0.01 0.9 $2
+time python testSeries.py $1 0.01 1 $2
+time python testSeries.py $1 0.01 1.1 $2
+time python testSeries.py $1 0.01 1.2 $2
+time python testSeries.py $1 0.01 1.3 $2
+time python testSeries.py $1 0.01 1.4 $2
+time python testSeries.py $1 0.01 1.5 $2
+time python testSeries.py $1 0.01 1.6 $2
