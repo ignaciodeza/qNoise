@@ -1,3 +1,58 @@
+// qNoise: A generator of non-Gaussian colored noise
+// Juan Ignacio Deza. 4 dic 2015. juan.ignacio.deza@upc.edu
+
+//We introduce a software generator for a class of colored (self-correlated) and
+//non-Gaussian noise, whose statistics and spectrum depend upon only two parameters. 
+//Inspired by Tsallis’ nonextensive formulation of statistical physics, this 
+//so-called q-distribution is a handy source of auto-correlated noise for a great 
+//variety of applications. This noise has a smooth limit for q = 1 to an Ornstein– 
+//Uhlenbeck noise of autocorrelation τ. The noise is generated via a stochastic 
+//differential equation using a second order Runge-Kutta integration scheme 
+//(also known as the Heun method) and it is implemented as a stand alone library 
+//in the language c++ available with an open source licence in the repository github[1]. 
+//Their statistics can be chosen at will, by varying a single parameter q: 
+//it has compact support for q < 1, and its variance tends to infinity as q 
+//approaches q = 5/3. The software here introduced focuses in the regime departures 
+//from Gaussianity, namely 0 < q < 5/3 where the variance is still normalizable. 
+//Furthermore. The autocorrelation of the noise can be tuned—by means of parameter 
+//τ—independently from the statistics providing a tool to examine the effects of 
+//non-Gaussian Colored noise, as a way to model many real-world types of noise. 
+//Applications are discussed, illustrating how the noise statistics affects the 
+//response of a variety of nonlinear systems. In many of these examples, the system’s 
+//response turns out to be optimal for some q 􏰀 1. This software is thus suitable 
+//for the simulation of a wide range of types of noise, or study the effect of 
+//correlation and deviations from Gaussianity in Stochastic ODEs, This is relevant 
+//for a wide variety of technological applications, as well as for the understanding 
+//of situations of biological interest.
+
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 
+//   1. Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//   2. Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//   3. The names of its contributors may not be used to endorse or promote 
+//      products derived from this software without specific prior written 
+//      permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+
 #ifndef QNOISEGEN_H
 #define QNOISEGEN_H
 

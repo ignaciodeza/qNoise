@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     //gen.seedManual(12345678); //Manual seeding (for debugging etc..), comment for auto seeding
     x = gen.gaussWN() / 100; //Initial value
      for (int i = 0; i < N + temp_time; i++) {
-        x = gen.qNoiseNorm(x, tau, q, H, sqrt_H);
+        x = gen.qNoise(x, tau, q, H, sqrt_H);
         if (i > temp_time)
             myfile << x << std::endl;
     }

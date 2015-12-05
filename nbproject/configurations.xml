@@ -15,7 +15,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.cpp</itemPath>
-      <itemPath>test.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -46,8 +45,6 @@
       </item>
       <item path="qNoise.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="test.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="test.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
@@ -74,8 +71,6 @@
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="qNoise.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="test.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="test.h" ex="false" tool="3" flavor2="0">
       </item>
