@@ -1,8 +1,6 @@
 # qNoise
 
-Automatic documentation generation from function information and
-docstrings. Requires that the zepto version of
-[mustache](http://github.com/zepto-land/mustache) is installed.
+Non-gaussian non white random noise generator. Useful as an input for numerical simulations, as a source of noise for controlling experiments and for a wide variety of applications.
 
 # Usage
 
