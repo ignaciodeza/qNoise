@@ -1,12 +1,11 @@
 /*
 qNoise: A generator of non-Gaussian colored noise
-Juan Ignacio Deza. Dic 2015. juan.ignacio.deza@upc.edu
+Copyright (c) 2015, Juan Ignacio Deza
+email: juan.ignacio.deza@upc.edu
+
 Description
-
 qNoise is a non-gaussian colored random noise generator. It is a handy source of self-correlated noise for a great variety of applications. It depends on two parameters only: tau for controlling the autocorrelation, and q for controlling the statistics. This noise tends smoothly  for q = 1 to an  Ornstein-Uhlenbeck (colored gaussian) noise with autocorrelation tau. for q < 1 it is bounded noise and it is supra-Gaussian for q > 1.
-
 The noise is generated  via a stochastic differential equation using the Heun method (a second order Runge-Kutta type integration scheme) and it is implemented as a stand-alone library in c++.
-
 It Useful as input for numerical simulations, as a source of noise for controlling experiments using synthetic noise via micro-controllers and for a wide variety of applications.
 
 Requirements
@@ -66,8 +65,8 @@ public:
     void seedTimer();
     double gaussWN();
     double orsUhl(double x, double tau, double H);
-    double qNoise(double eta, double tau, double q, double H, double sqrt_H);
-    double qNoiseNorm(double eta, double tau, double q, double H, double sqrt_H);
+    double qNoise(double x, double tau, double q, double H, double sqrt_H);
+    double qNoiseNorm(double x, double tau, double q, double H, double sqrt_H);
 
     qNoiseGen() {
         std::normal_distribution<double> randNorm(0.0, 1.0);
