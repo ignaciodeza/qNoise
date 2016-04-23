@@ -52,6 +52,9 @@ Licence
 #include <ctime>
 #include <cmath>
 #include <random>
+#include <chrono>
+#include <ctime>
+#include <ratio>
 
 class qNoiseGen {
     double potQNoisePrime(double eta, double tau, double q);
