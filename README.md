@@ -1,35 +1,59 @@
-# qNoise: A Generator of non-Gaussian Colored Noise
+# qNoise: A Generator of Non-Gaussian Colored Noise
 
-## Description
+<p align="center">
+  <a href="https://doi.org/10.1016/j.softx.2022.101034" target="_blank">
+    **📰 Paper DOI: 10.1016/j.softx.2022.101034**
+  </a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://ignaciodeza.github.io/qNoise/" target="_blank">
+    **💻 Live Demo & Frontend Tool**
+  </a>
+</p>
 
-**qNoise** is a non-gaussian colored random noise generator. It is a handy source of *self-correlated* noise for a great variety of applications. It depends on two parameters only: **tau** for controlling the autocorrelation, and **q** for controlling the statistics. This noise tends smoothly  for *q = 1* to an  *Ornstein-Uhlenbeck* (colored gaussian) noise with autocorrelation *tau*. for *q < 1* it is **bounded noise** and it is **supra-Gaussian** for *q > 1*.
+***
 
-The noise is generated  via a stochastic differential equation using the Heun method (a second order Runge-Kutta type integration scheme) and it is implemented as a stand-alone library in c++.
+## Project Overview
 
-It is useful as input for numerical simulations, as a source of noise for controlling experiments using synthetic noise via micro-controllers and for a wide variety of applications.
+**qNoise** is an efficient, stand-alone **C++ library** for generating self-correlated, non-Gaussian colored random noise. It is designed to be a versatile noise source for numerical simulations, experimental control, and statistical analysis across various complex systems.
 
-## Requirements
+The noise is defined by only two key parameters, offering precise control over its statistical and correlation properties:
 
-It is stand-alone with no dependencies other than the standard libraries.
-Due to it's use of some functions from the **\<random\>** library, it currently works on *c++11 or higher* **only**.
+* $\tau$ **(tau):** Controls the **autocorrelation time**.
+* $q$ **(q-parameter):** Controls the **statistics** (level of non-Gaussianity).
 
-This should be OK for most Macs and new Linux/Unix systems. On Windows please ensure you upgrade to a c++11 compatible compiler, for example **GNU g++ 4.7 or higher**.
+The generator is based on a stochastic differential equation (SDE) integrated via the Heun method (a second-order Runge-Kutta type scheme).
 
-In some older systems it is possible that you need to add `-std=gnu++11` to your compilation flags.
+### Statistical Regimes
 
-## Installation
+| Parameter | Regime | Description |
+| :---: | :--- | :--- |
+| **$q = 1$** | **Gaussian (Ornstein-Uhlenbeck)** | The noise smoothly approaches a standard colored Gaussian process with autocorrelation $\tau$. |
+| **$q < 1$** | **Sub-Gaussian** | The noise is **bounded** (finite variance and compact support). |
+| **$q > 1$** | **Supra-Gaussian** | The noise has heavier tails (non-Gaussian statistics). |
 
-#### Short story:
-Type the following commands on a terminal. The explanations come below.
+***
 
-```
-git clone https://github.com/ignaciodeza/qNoise.git
+## Requirements & Installation
+
+The library is entirely **stand-alone** with no dependencies beyond the C++ standard library. It requires **C++11 or higher** due to its use of the `<random>` library.
+
+### Installation & Testing (Short Story)
+
+To quickly clone, compile, and verify the installation:
+
+```bash
+# 1. Clone the repository
+git clone [https://github.com/ignaciodeza/qNoise.git](https://github.com/ignaciodeza/qNoise.git)
 cd qNoise/test
-make test
-./runTest.sh
 
+# 2. Compile the qNoise library and the test executable
+make test
+
+# 3. Run the battery of tests (verifies functionality and parameters)
+./runTest.sh
 ```
 If you see
+
 ```
 All tests OK.
 ```
@@ -174,5 +198,10 @@ If you wish to collaborate with this project please contact me to my email addre
 
 *Have fun!*
 
-Copyright (c) 2021, Juan Ignacio Deza
+## License
+
+This project is licensed under the **MIT License**. For the full terms, see the [LICENSE](https://github.com/ignaciodeza/qNoise/blob/main/LICENSE) file in the repository root.
+
+Copyright (c) 2021-2025, J. Ignacio Deza
+
 email: ignacio.deza@uwe.ac.uk
