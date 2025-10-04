@@ -2,11 +2,11 @@
 
 <p align="center">
   <a href="https://doi.org/10.1016/j.softx.2022.101034" target="_blank">
-    **📰 Paper DOI: 10.1016/j.softx.2022.101034**
+    <strong>Paper DOI: 10.1016/j.softx.2022.101034</strong>
   </a>
   &nbsp;&middot;&nbsp;
   <a href="https://ignaciodeza.github.io/qNoise/" target="_blank">
-    **💻 Live Demo & Frontend Tool**
+    <strong>Live Demo & Frontend Tool</strong>
   </a>
 </p>
 
@@ -173,8 +173,7 @@ The limit of 10% of difference for passing the test is arbitrary. But I found it
 
 ## References
 
-Please read the following paper which describes the software and it´s applications
-https://www.sciencedirect.com/science/article/pii/S2352711022000346
+Please read the following [paper](https://doi.org/10.1016/j.softx.2022.101034) which describes the software and it´s applications
 
 ## Citing
 
