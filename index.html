@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>qNoise Generator</title>
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Apply IBM Plex Sans globally for body text */
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        /* Apply IBM Plex Mono for code/data-like fields for an academic look */
+        input[type="number"], label {
+             font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* Publication Quality Plot Styling */
+        #chart {
+            background-color: white !important; 
+            box-shadow: none !important; 
+            border: 1px solid #d1d5db; 
+            position: relative; 
+            /* Fixed maximum width for optimal screen display */
+            max-width: 700px; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* D3 Gridline styling: lightgrey color */
+        .grid line {
+            stroke: lightgrey; 
+            stroke-opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+        .grid path {
+            stroke-width: 0;
+        }
+        
+        /* Ensure the chart container doesn't overflow */
+        #chart-container {
+            overflow-x: auto;
+        }
+
+        /* Remove default black domain line for the primary axes (Bottom and Left). */
+        .axis .domain {
+            stroke: none; 
+            stroke-width: 0;
+        }
+        
+        /* AXIS AND TICK LABEL SIZE INCREASE */
+        .axis text {
+            font-size: 11pt !important; /* Increased tick label size */
+            fill: black; /* Ensure tick text is black */
+        }
+        
+        /* Ensure points are above grid */
+        .plot-points {
+            z-index: 1; 
+        }
+        .grid-group {
+            z-index: 0; 
+        }
+        
+        /* Ensure labels wrap correctly to achieve 2 lines for alignment */
+        .form-label-wrap {
+            height: 40px; /* Fixed height to accommodate two lines of text */
+        }
+    </style>
+</head>
+<body class="bg-gray-50, text-gray-800 p-4 sm:p-8">
+    <div class="container mx-auto max-w-4xl p-6 bg-white shadow-xl rounded-lg">
+        
+        <header class="text-center mb-8 border-b pb-4 border-gray-200">
+            <h1 class="text-4xl font-semibold text-gray-900 mb-2">qNoise Generator</h1>
+            <h2 class="text-xl font-medium mb-1">
+                <a href="https://doi.org/10.1016/j.softx.2022.101034" target="_blank" class="text-indigo-700 hover:text-indigo-900">
+                    A Non-Gaussian and Non-White Noise Tool
+                </a>
+            </h2>
+            <p class="text-sm text-gray-500">
+                by Ignacio Deza | 
+                <a href="https://ignaciodeza.github.io/" target="_blank" class="text-indigo-600 hover:text-indigo-800">CV Link</a>
+            </p>
+        </header>
+
+        <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+            Generate a fully synthetic time series with unique characteristics. While the resulting series may mimic the complexity and patterns observed in time series from biological and physical processes, financial markets, and other complex systems, it is purely noise. This noise has a wide range of applications, including studying statistical properties of signals, creating surrogate data for model validation, and as a source of pure noise for statistical inference, among others.
+        </p>
+
+        <form id="numbersForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            
+            <div>
+                <label for="N" class="block text-sm font-medium text-gray-700 mb-1 form-label-wrap">
+                    N: <span class="text-gray-500 block text-xs">(up to 100,000 points)</span>
+                </label>
+                <input type="number" id="N" name="N" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base" required step="1" min="0" max="100000" value="1000">
+            </div>
+
+            <div>
+                <label for="q" class="block text-sm font-medium text-gray-700 mb-1 form-label-wrap">
+                    q: <span class="text-gray-500 block text-xs">(0 &lt; q ≤ 1.66)</span>
+                </label>
+                <input type="number" id="q" name="q" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base" required step="0.001" min="0.001" max="1.666" value="1.3">
+            </div>
+
+            <div>
+                <label for="tau" class="block text-sm font-medium text-gray-700 mb-1 form-label-wrap">
+                    τ: <span class="text-gray-500 block text-xs">(Autocorrelation Index)</span>
+                </label>
+                <input type="number" id="tau" name="tau" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base" required step="0.001" min="0" max="10000" value="1.1">
+            </div>
+
+            <div>
+                <label for="samplingRate" class="block text-sm font-medium text-gray-700 mb-1 form-label-wrap">
+                    Sampling Rate: <span class="text-gray-500 block text-xs">(points per second)</span>
+                </label>
+                <input type="number" id="samplingRate" name="samplingRate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base" required step="1" min="1" value="50">
+            </div>
+            
+            <div class="md:col-span-4 pt-2">
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Generate Noise
+                </button>
+            </div>
+        </form>
+
+        <div class="results" id="results"></div>
+        
+        <div id="chart-container">
+            <div id="chart" class="p-2 rounded-lg">
+                <p class="text-center text-gray-500 py-10">Noise time series will be plotted here after generation.</p>
+            </div>
+        </div>
+        
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button id="downloadButton" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-md text-base font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out" style="display: none;">
+                Download CSV
+            </button>
+            <button id="downloadPdfButton" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-md text-base font-medium text-white bg-indigo-700 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition duration-150 ease-in-out" style="display: none;">
+                Download Figure (PDF)
+            </button>
+        </div>
+
+
+        <footer class="mt-8 pt-4 border-t text-center text-sm text-gray-500">
+            <a href="https://github.com/ignaciodeza/qNoise" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                GitHub: ignaciodeza/qNoise
+            </a>
+        </footer>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        document.getElementById('numbersForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            // Reset UI for new generation
+            document.getElementById('results').textContent = '';
+            d3.select("#chart").selectAll("*").remove();
+            document.getElementById('downloadButton').style.display = 'none';
+            document.getElementById('downloadPdfButton').style.display = 'none';
+            d3.select("#chart").append("p").attr("class", "text-center text-gray-500 py-10").text("Generating...");
+
+
+            // Get the form values
+            const N = parseInt(document.getElementById('N').value);
+            const q = parseFloat(document.getElementById('q').value);
+            const tau = parseFloat(document.getElementById('tau').value);
+            const samplingRate = parseFloat(document.getElementById('samplingRate').value);
+
+            const data = {
+                N: N.toString(),
+                q: q.toString(),
+                tau: tau.toString()
+            };
+
+            try {
+                // Actual API endpoint
+                const apiUrl = 'https://qnoise.ew.r.appspot.com/qnoise';
+
+                // Make the API call
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+
+                // Parse the API response
+                const result = await response.json();
+                const dataList = result.data;
+
+                // Calculate Time Index in Seconds
+                const timeData = dataList.map((value, index) => index / samplingRate);
+                
+                // --- D3.js Plotting Logic ---
+                const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+                
+                // FIXED ASPECT RATIO (Taller/more squarish)
+                const targetWidth = 650; 
+                const targetHeight = 450; 
+
+                const width = targetWidth - margin.left - margin.right;
+                const height = targetHeight - margin.top - margin.bottom;
+
+                // Clear "Generating..." message
+                d3.select("#chart").selectAll("*").remove();
+                
+                const svg = d3.select("#chart")
+                    .append("svg")
+                    .attr("id", "qnoise-plot") // ID for export
+                    .attr("width", width + margin.left + margin.right) 
+                    .attr("height", height + margin.top + margin.bottom)
+                    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`) 
+                    .attr("style", "max-width: 100%; height: auto; display: block;")
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                // Scales
+                const x = d3.scaleLinear()
+                    .domain([0, d3.max(timeData)])
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain(d3.extent(dataList)).nice()
+                    .range([height, 0]);
+
+                // Axes 
+                const xAxis = d3.axisBottom(x).ticks(5).tickSize(5); 
+                const yAxis = d3.axisLeft(y).ticks(5).tickSize(5); 
+
+                // Add Gridlines FIRST (behind data)
+                const gridGroup = svg.append("g").attr("class", "grid-group");
+
+                gridGroup.append("g")
+                    .attr("class", "grid")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(
+                        d3.axisBottom(x)
+                            .ticks(5)
+                            .tickSize(-height)
+                            .tickFormat("")
+                    );
+
+                gridGroup.append("g")
+                    .attr("class", "grid")
+                    .call(
+                        d3.axisLeft(y)
+                            .ticks(5)
+                            .tickSize(-width)
+                            .tickFormat("")
+                    );
+
+
+                // Add X Axis (above grid)
+                svg.append("g")
+                    .attr("class", "axis") 
+                    .attr("transform", `translate(0,${height})`)
+                    .call(xAxis)
+                    .style("font-family", "'IBM Plex Mono', monospace");
+
+                // Add Y Axis (above grid)
+                svg.append("g")
+                    .attr("class", "axis") 
+                    .call(yAxis)
+                    .style("font-family", "'IBM Plex Mono', monospace");
+
+                // --- AXIS BORDER LINES ---
+
+                // Left Axis Line (black)
+                svg.append("line")
+                    .attr("x1", 0)
+                    .attr("x2", 0)
+                    .attr("y1", 0)
+                    .attr("y2", height)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1); 
+                
+                // Bottom Axis Line (black)
+                svg.append("line")
+                    .attr("x1", 0)
+                    .attr("x2", width)
+                    .attr("y1", height)
+                    .attr("y2", height)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1); 
+
+                // Top Axis Line (Black)
+                svg.append("line")
+                    .attr("x1", 0)
+                    .attr("x2", width)
+                    .attr("y1", 0)
+                    .attr("y2", 0)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1); 
+
+                // Right Axis Line (Black)
+                svg.append("line")
+                    .attr("x1", width)
+                    .attr("x2", width)
+                    .attr("y1", 0)
+                    .attr("y2", height)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1); 
+
+
+                // Plot points (above grid), now black
+                let markerSize;
+                if (dataList.length < 500) {
+                    markerSize = 2.5; 
+                } else if (dataList.length < 5000) {
+                    markerSize = 1.0; 
+                } else {
+                    markerSize = 0.5; 
+                }
+                
+                svg.append("g") 
+                    .attr("class", "plot-points") 
+                    .selectAll("circle")
+                    .data(dataList)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", (d, i) => x(timeData[i])) 
+                    .attr("cy", d => y(d))
+                    .attr("r", markerSize)
+                    .attr("fill", "black"); 
+                
+                // Add labels (Units)
+                svg.append("text")
+                    .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 2})`) 
+                    .style("text-anchor", "middle")
+                    .style("font-family", "'IBM Plex Sans', sans-serif")
+                    .style("font-size", "13pt") 
+                    .attr("fill", "black") 
+                    .text("Time (s)"); 
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left)
+                    .attr("x", 0 - (height / 2))
+                    .attr("dy", "0.7em") 
+                    .style("text-anchor", "middle")
+                    .style("font-family", "'IBM Plex Sans', sans-serif")
+                    .style("font-size", "13pt") 
+                    .attr("fill", "black") 
+                    .text("Noise Value (xi)"); 
+
+                // --- Button Logic ---
+
+                // Enable buttons
+                document.getElementById('downloadButton').style.display = 'block';
+                document.getElementById('downloadPdfButton').style.display = 'block';
+                
+                // 1. Download CSV
+                document.getElementById('downloadButton').onclick = function () {
+                    const csvContent = `data:text/csv;charset=utf-8,Time (s),Value (xi)\n` +
+                        dataList.map((value, index) => `${timeData[index].toFixed(5)},${value}`).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `qNoise_${N}_${q}_${tau}_${samplingRate}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+
+                // 2. Download Figure (PDF) - Uses html2canvas to rasterize the SVG plot
+                document.getElementById('downloadPdfButton').onclick = async function () {
+                    const { jsPDF } = window.jspdf;
+                    const chartElement = document.getElementById('chart'); 
+                    
+                    try {
+                        // 1. Convert the chart DIV (which contains the SVG) to a canvas (image)
+                        const canvas = await html2canvas(chartElement, {
+                            scale: 4, // **High Scale** for publication-level resolution
+                            backgroundColor: '#ffffff' 
+                        });
+
+                        const imgData = canvas.toDataURL('image/jpeg', 1.0); // Use max quality (1.0)
+                        
+                        // 2. Create a PDF document (Landscape A4: 842 x 595 pt)
+                        const doc = new jsPDF('l', 'pt', 'a4'); 
+                        
+                        const pdfPageWidth = doc.internal.pageSize.getWidth(); // 842 pt
+                        const pdfPageHeight = doc.internal.pageSize.getHeight(); // 595 pt
+                        
+                        // Calculate Aspect Ratio Fit (maximize size while keeping original proportions)
+                        const imgAspect = canvas.width / canvas.height;
+                        const pageAspect = pdfPageWidth / pdfPageHeight;
+
+                        let pdfImgWidth, pdfImgHeight;
+                        const marginPt = 40; // 20pt margin on all sides
+
+                        if (imgAspect > pageAspect) {
+                            // Image is wider: fit to page width
+                            pdfImgWidth = pdfPageWidth - marginPt; 
+                            pdfImgHeight = pdfImgWidth / imgAspect;
+                        } else {
+                            // Image is taller: fit to page height
+                            pdfImgHeight = pdfPageHeight - marginPt;
+                            pdfImgWidth = pdfImgHeight * imgAspect;
+                        }
+
+                        // Center image on the PDF page
+                        const xOffset = (pdfPageWidth - pdfImgWidth) / 2;
+                        const yOffset = (pdfPageHeight - pdfImgHeight) / 2;
+                        
+                        // 3. Add the image to the PDF
+                        doc.addImage(imgData, 'JPEG', xOffset, yOffset, pdfImgWidth, pdfImgHeight);
+
+                        doc.save(`qNoise_figure_${N}_${q}_${tau}_${samplingRate}.pdf`);
+                    } catch (error) {
+                        console.error("Error generating PDF via html2canvas:", error);
+                        alert("Failed to generate PDF. Check console for details.");
+                    }
+                };
+
+            } catch (error) {
+                // Handle errors and display them prominently
+                d3.select("#chart").selectAll("*").remove();
+                document.getElementById('results').innerHTML = `<p class="text-red-600 font-bold text-center py-4">Error: Failed to generate noise. <span class="font-mono text-sm">${error.message}</span></p>`;
+            }
+        });
+    </script>
+</body>
+</html>
