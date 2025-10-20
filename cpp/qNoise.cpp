@@ -125,7 +125,7 @@ double qNoiseGen::qNoise(double eta, double tau, double q, double H,
      * error is on place to debug these errors. However it should be a concern
      * only for very low values of q and very high values of tau.
      */
-    if ((fabs(eta + differential) > etaCut) || isnan(eta + differential)) {
+    if ((fabs(eta + differential) > etaCut) || std::isnan(eta + differential)) {
       countError++;
       if (countError > 20) {
         if (error)
