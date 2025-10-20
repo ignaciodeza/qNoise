@@ -8,7 +8,7 @@ version = "1.0.1"
 description = "Non-Gaussian colored noise generator"
 readme = "README.md"
 requires-python = ">=3.8"
-license = "MIT"
+license = {text = "MIT"}
 authors = [{name = "J. Ignacio Deza", email = "ignacio.deza@uwe.ac.uk"}]
 keywords = ["noise", "stochastic", "non-gaussian", "colored-noise"]
 classifiers = [
