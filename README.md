@@ -8,13 +8,17 @@
   <a href="https://ignaciodeza.github.io/qNoise/" target="_blank">
     <strong>Live Demo & Frontend Tool</strong>
   </a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://pypi.org/project/qnoise/" target="_blank">
+    <strong>PyPI Package</strong>
+  </a>
 </p>
 
 ***
 
 ## Project Overview
 
-**qNoise** is an efficient, stand-alone **C++ library** for generating self-correlated, non-Gaussian colored random noise. It is designed to be a versatile noise source for numerical simulations, experimental control, and statistical analysis across various complex systems.
+**qNoise** is an efficient library for generating self-correlated, non-Gaussian colored random noise. Available in **C++**, **Python**, and **Go**, it is designed as a versatile noise source for numerical simulations, experimental control, and statistical analysis across various complex systems.
 
 The noise is defined by only two key parameters, offering precise control over its statistical and correlation properties:
 
@@ -33,151 +37,97 @@ The generator is based on a stochastic differential equation (SDE) integrated vi
 
 ***
 
-## Requirements & Installation
+## Available Implementations
 
-The library is entirely **stand-alone** with no dependencies beyond the C++ standard library. It requires **C++11 or higher** due to its use of the `<random>` library.
+### Python
 
-### Installation & Testing (Short Story)
-
-To quickly clone, compile, and verify the installation:
+The recommended implementation for most users. Available via PyPI with C++ backend for performance.
 
 ```bash
-# 1. Clone the repository
-git clone [https://github.com/ignaciodeza/qNoise.git](https://github.com/ignaciodeza/qNoise.git)
-cd qNoise/test
-
-# 2. Compile the qNoise library and the test executable
-make test
-
-# 3. Run the battery of tests (verifies functionality and parameters)
-./runTest.sh
+pip install qnoise
 ```
-If you see
 
-```
-All tests OK.
-```
-at the end of the process then **qNoise** is installed and works in your system, if you don't want to know more about the installation, you can go directly to **Usage**.
+```python
+import qnoise
 
-#### Long story:
+# Generate non-Gaussian colored noise
+noise = qnoise.generate(tau=1.0, q=1.5, N=10000)
 
-If you haven't done this yet, clone the repository by typing on a terminal window
+# Generate Gaussian colored noise (Ornstein-Uhlenbeck)
+gauss_noise = qnoise.ornstein_uhlenbeck(tau=1.0, N=10000)
 ```
+
+**[→ Python Documentation](python/README.md)**
+
+### C++
+
+High-performance standalone implementation with no dependencies beyond the C++ standard library.
+
+```bash
 git clone https://github.com/ignaciodeza/qNoise.git
-```
-To compile the test, from the terminal go to the folder test inside the cloned directory by typing:
-```
-cd qNoise/test
-```
-Compile the test, using the qNoise library
-```
-make test
-```
-and run the battery of tests.
-```
-./runTest.sh
-```
-In less than a second, examples of several types of noise will be shown in the terminal. The files will be saved on disk.
-You should see several sets of parameters and in the last line:
-```
-All tests OK.
-```
-This means the software is installed and works in your system.
-
-For cleaning the files and the executables from the test folder, simply type
-```
-make clean
+cd qNoise/cpp
 ```
 
-## Usage
+```cpp
+#include "qNoise.h"
 
-#### Source Code
-Just move both `qNoise.h` and `qNoise.cpp` to the folder where your code is. No other installation is necessary.
-Include as `#include"qNoise.h"`in your projects.
-
-In some older systems is possible that you need to add `-std=gnu++11` to your compilation flags.
-
-##### Contents
-The library provides four methods.
-
-A generator of Gaussian white noise (for convenience).
-```
-double gaussWN();
-```
-A generator of Gaussian Colored noise (Orstein-Uhlenbeck)
-```
-double orsUhl(double x, double tau, double H);
-```
-A generator of qNoise, valid in the whole range, where *tau* and the variance of the noise diverge for *q = 5/3*
-```
-double qNoise(double x, double tau, double q, double H, double sqrt_H);
-```
-A normalized version of the former, where *tau* and the variance are independent of q, valid sufficiently far away from *q = 5/3*
-```
-double qNoiseNorm(double x, double tau, double q, double H, double sqrt_H);
-```
-Additionally it provides two methods for seeding the random number generator, manually and using the timer:
-```
-void seedManual(unsigned Seed);
-void seedTimer();
-```
-The timer is used by default.
-
-#### Executable
-The executable `test_qNoise` can be also used as a standalone noise generator.
-
-It accepts four commands
-```
-./test_qNoise tau H q N
-```
-- **tau** is the autocorrelation
-- **H** is the integration step
-- **q** controls the statistics
-- **N** is the number of points to calculate
-
-For example (try it!):
-
-```
-./test_qNoise 1 0.01 1.2 1000
-```
-will generate 1000 points of supra-Gaussian noise (q=1.2) of tau=1 (relative to H=0.01 )
-and put them into the file
-```
-qNoise_1_0.01_1.2_1000.txt
-```
-which explicitly contains all the parameters.
-
-This file together with the `runTest.sh` can be edited to better suit your needs and compiled using the same scheme provided above.
-
-## Unit Test
-
-A set of unit tests is provided. It is a rather stern test which compares the histograms to the theoretical PDFs. It calculates the square root of sum the square of the difference between both functions as a percentage of the maximum height of the distribution. 
-This allows to have a metric of the "goodness" of the histogram of the generated noise. Note that it may take time (N) for the histogram to take the shape of the PDF, and this time may be considerably higher for highly correlated noise. 
-
-In order to access to this unit test first uncomment the following line in `qNoise.cpp`:
-
-```
-// #define UNIT_TEST
-#ifdef UNIT_TEST
-#include "unit_tests.cpp"
-#endif
+qNoiseGen gen;
+double x = 0.0;
+for(int i = 0; i < 1000; i++) {
+    x = gen.qNoise(x, tau, q, H, sqrt_H);
+}
 ```
 
-And then compile and run, with a command similar to this (it may change in your system):
+**[→ C++ Documentation](cpp/README.md)**
+
+### Go
+
+Lightweight implementation suitable for cloud deployment and microservices.
+
+```bash
+go get github.com/ignaciodeza/qNoise/go
+```
+
+**[→ Go Documentation](go/README.md)**
+
+***
+
+## Applications
+
+**Monte Carlo Simulations**  
+Generate realistic non-Gaussian stochastic processes for financial risk models, reliability analysis, and complex system simulations.
+
+**Algorithm Robustness Testing**  
+Test machine learning models and signal processing algorithms against realistic heavy-tailed and correlated noise conditions.
+
+**Rare Event Simulation**  
+Model extreme events and tail behavior using supra-Gaussian noise for stress testing and risk assessment.
+
+**Experimental Control**  
+Provide synthetic noise sources for laboratory experiments and control systems requiring specific statistical properties.
+
+***
+
+## Repository Structure
 
 ```
-c++ -std=gnu++11 qNoise.cpp -o qNoise; qNoise
+qNoise/
+├── cpp/              # C++ implementation and headers
+├── python/           # Python package with pybind11 bindings
+├── go/               # Go implementation
+├── test/             # C++ test suite and validation
+└── docs/             # Documentation and interactive demo
 ```
 
-The limit of 10% of difference for passing the test is arbitrary. But I found it to be a good guideline for most applications.
+***
 
 ## References
 
-Please read the following [paper](https://doi.org/10.1016/j.softx.2022.101034) which describes the software and it´s applications
+Please read the following [paper](https://doi.org/10.1016/j.softx.2022.101034) which describes the software and its applications.
 
 ## Citing
 
-If you use this software please cite us! Bibtex entry below
+If you use this software please cite us:
 
 ```
 @article{deza2022qnoise,
@@ -193,9 +143,7 @@ If you use this software please cite us! Bibtex entry below
 
 ## Collaboration
 
-If you wish to collaborate with this project please contact me to my email address below.
-
-*Have fun!*
+If you wish to collaborate with this project please contact me at the email address below.
 
 ## License
 
